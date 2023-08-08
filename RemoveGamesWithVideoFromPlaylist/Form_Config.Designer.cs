@@ -60,6 +60,7 @@
 			this.Controls.Add(this.comboBox1);
 			this.Name = "Form_Config";
 			this.Text = "Form1";
+			this.Load += new System.EventHandler(this.Form_Config_Load);
 			this.ResumeLayout(false);
 
 		}

@@ -17,16 +17,13 @@ namespace RemoveGamesWithVideoFromPlaylist
 		public Form_Config()
 		{
 			InitializeComponent();
-			Playlist = PluginHelper.DataManager.GetAllPlaylists().Where(p => p.AutoPopulate == false).OrderBy(p => p.Name).ToList();
-			foreach (var p in Playlist)
-			{
-				comboBox1.Items.Add(p.Name);
-			}
+
 		}
 
 		private void button1_Click(object sender, EventArgs e)
 		{
 			var ListGameToRemove = new List<Unbroken.LaunchBox.Plugins.Data.IPlaylistGame>();
+			var ListForFilterOutDuplicate = new List<string>();
 			if (String.IsNullOrEmpty(comboBox1.Text)) return;
 			foreach (var p in Playlist)
 			{
@@ -38,7 +35,19 @@ namespace RemoveGamesWithVideoFromPlaylist
 						var videos = g.GetVideoPath();
 						if(videos != null && videos.Count() > 0)
 						{
+							ListForFilterOutDuplicate.Add(pg.GameTitle);
 							ListGameToRemove.Add(pg);
+						}
+						else
+						{
+							if (ListForFilterOutDuplicate.Contains(pg.GameTitle))
+							{
+								ListGameToRemove.Add(pg);
+							}
+							else
+							{
+								ListForFilterOutDuplicate.Add(pg.GameTitle);
+							}
 						}
 
 					}
@@ -53,6 +62,16 @@ namespace RemoveGamesWithVideoFromPlaylist
 					}
 					MessageBox.Show($"Removed {ListGameToRemove.Count()} games from playlist");
 				}
+			}
+		}
+
+		private void Form_Config_Load(object sender, EventArgs e)
+		{
+			comboBox1.Items.Clear();
+			Playlist = PluginHelper.DataManager.GetAllPlaylists().Where(p => p.AutoPopulate == false).OrderBy(p => p.Name).ToList();
+			foreach (var p in Playlist)
+			{
+				comboBox1.Items.Add(p.Name);
 			}
 		}
 	}
